@@ -46,8 +46,8 @@ def forge_errors(lines):
     return [line for line in errors if line]
 
 
-def flake8_errors(lines):
-    return [line for line in lines if line]
+def generic_errors(lines):
+    return [line for line in lines if line and not line.startswith("#")]
 
 
 def black_errors(lines):
@@ -75,7 +75,19 @@ def try_quickfix(errors, localize):
     sys.exit(-1)
 
 
-formats = dict(forge=forge_errors, flake8=flake8_errors, black=black_errors)
+formats = dict(forge=forge_errors, black=black_errors)
+
+
+def get_formatter(command, fmt):
+    if fmt is None:
+        cmd = shlex.split(command)[0]
+        for key in formats:
+            if key == cmd:
+                fmt = key
+                break
+
+    formatter = formats.get(fmt, generic_errors)
+    return formatter
 
 
 def vimfix(command, quiet, ignore_stderr, ignore_stdout, strip, fmt, output, localize):
@@ -98,11 +110,13 @@ def vimfix(command, quiet, ignore_stderr, ignore_stdout, strip, fmt, output, loc
     else:
         stripper = strip_crlf
 
+    formatter = get_formatter(command, fmt)
+
     errors = []
     if not ignore_stdout:
-        errors.extend(formats[fmt]([stripper(line) for line in proc.stdout.decode().split("\n")]))
+        errors.extend(formatter([stripper(line) for line in proc.stdout.decode().split("\n")]))
     if not ignore_stderr:
-        errors.extend(formats[fmt]([stripper(line) for line in proc.stderr.decode().split("\n")]))
+        errors.extend(formatter([stripper(line) for line in proc.stderr.decode().split("\n")]))
 
     if len(errors):
         try_quickfix(errors, localize)

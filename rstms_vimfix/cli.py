@@ -82,14 +82,6 @@ def cli(
     else:
         command = shlex.join(command)
 
-    if fmt is None:
-        for _fmt in formats.keys():
-            if command.split()[0] == _fmt:
-                fmt = _fmt
-                break
-    if not fmt:
-        fmt = list(formats.keys())[0]
-
     vimfix(command, quiet, ignore_stderr, ignore_stdout, strip, fmt, output, localize)
 
 
