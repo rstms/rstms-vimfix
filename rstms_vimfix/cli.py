@@ -75,7 +75,9 @@ def cli(
     command,
 ):
 
-    if len(command) == 1:
+    if len(command) == 0:
+        raise click.BadArgumentUsage("missing COMMAND", ctx=ctx)
+    elif len(command) == 1:
         command = command[0]
     else:
         command = shlex.join(command)
