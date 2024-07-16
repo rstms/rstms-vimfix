@@ -7,8 +7,6 @@ import tty
 from pathlib import Path
 from subprocess import PIPE, run
 
-import click
-
 
 def get_char():
     fd = sys.stdin.fileno()
@@ -48,11 +46,28 @@ def forge_errors(lines):
 
 
 def flake8_errors(lines):
-    raise RuntimeError("flake8 not implemented")
+    return [line for line in lines if line]
+
+
+# awk -F: '/^error: cannot format/{\
+#    file=$2; error=$3; row=$4; col=$5; source=$6;
+#    gsub(/^.*cannot format\s/, "", file);\
+#    printf("%s:%d:%d: [black]%s: %s\n", file, row, col, error, source);
+# }'
 
 
 def black_errors(lines):
-    raise RuntimeError("black not implemented")
+    p = re.compile(r"^error: cannot format\s(.*)")
+    errors = []
+    for line in lines:
+        m = p.match(line)
+        if m:
+            line = m.groups()[0]
+            file, error, row, col, source = [f.strip() for f in line.split(":")[:5]]
+            line = f"{file}:{row}:{col}: [black]{error} {source}"
+            errors.append(line)
+
+    return [line for line in errors if line]
 
 
 def try_quickfix(errors):
@@ -96,7 +111,7 @@ def vimfix(command, quiet, ignore_stderr, ignore_stdout, strip, fmt, output):
     if not ignore_stderr:
         errors.extend(formats[fmt]([stripper(line) for line in proc.stderr.decode().split("\n")]))
 
-    if errors:
+    if len(errors):
         try_quickfix(errors)
 
     if output is not None and proc.returncode == 0:

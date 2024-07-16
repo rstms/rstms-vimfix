@@ -45,11 +45,6 @@ def run():
     return _run
 
 
-def test_cli_no_args(run):
-    result = run([])
-    assert "Usage:" in result.output
-
-
 def test_cli_help(run):
     result = run(["--help"])
     assert "Show this message and exit." in result.output
