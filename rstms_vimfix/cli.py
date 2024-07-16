@@ -39,6 +39,7 @@ def _ehandler(ctx, option, debug):
 @click.option("-q", "--quiet", is_flag=True, help="no echo stdout")
 @click.option("-E", "--ignore-stderr", is_flag=True, help="ignore stderr when scanning")
 @click.option("-O", "--ignore-stdout", is_flag=True, help="ignore stdout when scanning")
+@click.option("-l/-L", "--localize/--no-localize", is_flag=True, help="localize source file path in error output")
 @click.option(
     "-s/-S",
     "--strip/--no-strip",
@@ -69,6 +70,7 @@ def cli(
     strip,
     fmt,
     output,
+    localize,
     command,
 ):
     if fmt is None:
@@ -77,9 +79,9 @@ def cli(
                 fmt = _fmt
                 break
     if not fmt:
-        fmt = formats.keys()[0]
+        fmt = list(formats.keys())[0]
 
-    vimfix(command, quiet, ignore_stderr, ignore_stdout, strip, fmt, output)
+    vimfix(command, quiet, ignore_stderr, ignore_stdout, strip, fmt, output, localize)
 
 
 if __name__ == "__main__":

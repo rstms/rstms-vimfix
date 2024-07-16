@@ -15,6 +15,7 @@ def test_version():
     assert rstms_vimfix.__name__ == "rstms_vimfix"
     assert __version__
     assert isinstance(__version__, str)
+    fleem
 
 
 @pytest.fixture

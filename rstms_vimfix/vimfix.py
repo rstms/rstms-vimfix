@@ -8,7 +8,6 @@ from subprocess import PIPE, run
 
 from .verify import verify
 
-
 def strip_ansi_codes(s):
     return strip_crlf(re.sub(r"\x1B[@-_][0-?]*[ -/]*[@-~]", "", s))
 
@@ -24,8 +23,8 @@ def eformat(error, detail):
 
 def ospath(path):
     parts = Path(path).parts
-    ret = os.path.join(*parts)
-    return ret
+    path = os.path.join(*parts)
+    return path
 
 
 def fix_path(line):
@@ -43,11 +42,11 @@ def forge_errors(lines):
             errors = []
     if errors is None:
         errors = []
-    return [fix_path(line) for line in errors if line]
+    return [line for line in errors if line]
 
 
 def flake8_errors(lines):
-    return [fix_path(line) for line in lines if line]
+    return [line for line in lines if line]
 
 
 def black_errors(lines):
@@ -58,16 +57,17 @@ def black_errors(lines):
         if m:
             line = m.groups()[0]
             file, error, row, col, source = [f.strip() for f in line.split(":")[:5]]
-            file = str(ospath(file))
             line = f"{file}:{row}:{col}: [black]{error} {source}"
             errors.append(line)
 
-    return [fix_path(line) for line in errors if line]
+    return [line for line in errors if line]
 
 
-def try_quickfix(errors):
+def try_quickfix(errors, localize):
     if verify("fix"):
         quickfix = Path(".quickfix")
+        if localize:
+            errors = [fix_path(line) for line in errors if line]
         quickfix.write_text("\n".join(errors))
         run(["vim", "-q", str(quickfix)])
         quickfix.unlink()
@@ -77,7 +77,7 @@ def try_quickfix(errors):
 formats = dict(forge=forge_errors, flake8=flake8_errors, black=black_errors)
 
 
-def vimfix(command, quiet, ignore_stderr, ignore_stdout, strip, fmt, output):
+def vimfix(command, quiet, ignore_stderr, ignore_stdout, strip, fmt, output, localize):
     """run a command, check for compile errors, and optionally run vim quickfix"""
 
     proc = run(shlex.split(command), stdout=PIPE, stderr=PIPE)
@@ -104,7 +104,7 @@ def vimfix(command, quiet, ignore_stderr, ignore_stdout, strip, fmt, output):
         errors.extend(formats[fmt]([stripper(line) for line in proc.stderr.decode().split("\n")]))
 
     if len(errors):
-        try_quickfix(errors)
+        try_quickfix(errors, localize)
 
     if output is not None and proc.returncode == 0:
         # write output file only if no errors
