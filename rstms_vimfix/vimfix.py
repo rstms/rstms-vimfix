@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import re
+import shlex
 import sys
 import termios
 import tty
-import shlex
 from pathlib import Path
 from subprocess import PIPE, run
 
@@ -24,8 +24,10 @@ def get_char():
 def strip_ansi_codes(s):
     return strip_crlf(re.sub(r"\x1B[@-_][0-?]*[ -/]*[@-~]", "", s))
 
+
 def strip_crlf(s):
     return s.strip()
+
 
 def eformat(error, detail):
     _, _, detail = detail.partition("--> ")
@@ -54,10 +56,10 @@ def black_errors(lines):
 
 
 def try_quickfix(errors):
-    print('\nfix? [Y/n] ', end='', flush=True)
+    print("\nfix? [Y/n] ", end="", flush=True)
     key = get_char()
     print()
-    if key in ['\r', '\n', 'y', 'Y']:
+    if key in ["\r", "\n", "y", "Y"]:
         quickfix = Path(".quickfix")
         quickfix.write_text("\n".join(errors))
         run(["vim", "-q", str(quickfix)])
@@ -67,13 +69,14 @@ def try_quickfix(errors):
 
 formats = dict(forge=forge_errors, flake8=flake8_errors, black=black_errors)
 
+
 def vimfix(command, quiet, ignore_stderr, ignore_stdout, strip, fmt, output):
     """run a command, check for compile errors, and optionally run vim quickfix"""
 
     proc = run(shlex.split(command), stdout=PIPE, stderr=PIPE)
 
     if proc.returncode != 0:
-        quiet=False
+        quiet = False
 
     if not quiet:
         sys.stdout.write(proc.stdout.decode())
@@ -89,13 +92,9 @@ def vimfix(command, quiet, ignore_stderr, ignore_stdout, strip, fmt, output):
 
     errors = []
     if not ignore_stdout:
-        errors.extend(formats[fmt](
-            [stripper(line) for line in proc.stdout.decode().split("\n")]
-        ))
+        errors.extend(formats[fmt]([stripper(line) for line in proc.stdout.decode().split("\n")]))
     if not ignore_stderr:
-        errors.extend(formats[fmt](
-            [stripper(line) for line in proc.stderr.decode().split("\n")]
-        ))
+        errors.extend(formats[fmt]([stripper(line) for line in proc.stderr.decode().split("\n")]))
 
     if errors:
         try_quickfix(errors)
