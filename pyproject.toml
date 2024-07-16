@@ -11,7 +11,7 @@ version = "0.1.1"
 authors = [{name = "Matt Krueger", email = "mkrueger@rstms.net"}]
 readme = {file = "README.md", content-type = "text/markdown"}
 license = {file = "LICENSE"}
-keywords = ["rstms_vimfix"]
+keywords = ["rstms", "vim", "quickfix", "rstms-vimfix"]
 classifiers = [
   "Intended Audience :: Developers",
 
@@ -51,7 +51,7 @@ docs = [
 ]
 
 [project.urls]
-Home = "https://github.com/rstms/rstms_vimfix"
+Home = "https://github.com/rstms/rstms-vimfix"
 [tool.black]
 line-length = 79
 

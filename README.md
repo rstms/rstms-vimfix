@@ -2,10 +2,9 @@ rstms-vimfix
 ============
 
 
-![Image](https://img.shields.io/github/license/rstms/rstms_vimfix)
+![Image](https://img.shields.io/github/license/rstms/rstms-vimfix)
 
-![Image](https://img.shields.io/pypi/v/rstms_vimfix.svg)
-
+![Image](https://img.shields.io/pypi/v/rstms-vimfix.svg)
 
 
 
