@@ -27,7 +27,7 @@ def _ehandler(ctx, option, debug):
 @click.option("--shell-completion", is_flag=False, flag_value="[auto]", callback=_shell_completion, help="configure shell completion")
 @click.pass_context
 def cli(ctx, debug, shell_completion):
-    """rstms_vimfix top-level help"""
+    """Run a compile command and process the output for vim quickfix mode"""
     pass
 
 @cli.command
