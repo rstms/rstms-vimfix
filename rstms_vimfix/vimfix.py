@@ -2,21 +2,10 @@
 import re
 import shlex
 import sys
-import termios
-import tty
 from pathlib import Path
 from subprocess import PIPE, run
 
-
-def get_char():
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    try:
-        tty.setraw(fd)
-        ch = sys.stdin.read(1)
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    return ch
+from .verify import verify
 
 
 def strip_ansi_codes(s):
@@ -71,10 +60,7 @@ def black_errors(lines):
 
 
 def try_quickfix(errors):
-    print("\nfix? [Y/n] ", end="", flush=True)
-    key = get_char()
-    print()
-    if key in ["\r", "\n", "y", "Y"]:
+    if verify("fix"):
         quickfix = Path(".quickfix")
         quickfix.write_text("\n".join(errors))
         run(["vim", "-q", str(quickfix)])
