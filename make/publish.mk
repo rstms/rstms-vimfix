@@ -13,6 +13,7 @@ publish: release
 	else \
 	  echo $(dist_name) $(version) is up-to-date on PyPI;\
 	fi
+	which devpi >/dev/null && devpi refresh $(project)
 
 # check current pypi version 
 pypi-check:
