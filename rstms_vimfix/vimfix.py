@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import re
 import shlex
 import sys
@@ -21,6 +22,17 @@ def eformat(error, detail):
     return f"{detail}{error}"
 
 
+def ospath(path):
+    parts = Path(path).parts
+    ret = os.path.join(*parts)
+    return ret
+
+
+def fix_path(line):
+    path, _, tail = line.partition(":")
+    return str(ospath(path)) + ":" + tail
+
+
 def forge_errors(lines):
     """return quickfix error list"""
     errors = None
@@ -31,18 +43,11 @@ def forge_errors(lines):
             errors = []
     if errors is None:
         errors = []
-    return errors
+    return [fix_path(line) for line in errors if line]
 
 
 def flake8_errors(lines):
-    return [line for line in lines if line]
-
-
-# awk -F: '/^error: cannot format/{\
-#    file=$2; error=$3; row=$4; col=$5; source=$6;
-#    gsub(/^.*cannot format\s/, "", file);\
-#    printf("%s:%d:%d: [black]%s: %s\n", file, row, col, error, source);
-# }'
+    return [fix_path(line) for line in lines if line]
 
 
 def black_errors(lines):
@@ -53,10 +58,11 @@ def black_errors(lines):
         if m:
             line = m.groups()[0]
             file, error, row, col, source = [f.strip() for f in line.split(":")[:5]]
+            file = str(ospath(file))
             line = f"{file}:{row}:{col}: [black]{error} {source}"
             errors.append(line)
 
-    return [line for line in errors if line]
+    return [fix_path(line) for line in errors if line]
 
 
 def try_quickfix(errors):
