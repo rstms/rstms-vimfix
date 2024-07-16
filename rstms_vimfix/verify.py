@@ -24,8 +24,7 @@ def get_char():
 def verify(prompt):
     print(f"\n{prompt}? [Y/n] ", end="", flush=True)
     if os.name == "nt":
-        breakpoint()
-        key = msvcrt.getch()
+        key = msvcrt.getch().decode()
     elif os.name == "posix":
         key = get_char()
     else:
