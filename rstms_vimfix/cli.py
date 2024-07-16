@@ -1,5 +1,6 @@
 """Console script for rstms_vimfix."""
 
+import shlex
 import sys
 from pathlib import Path
 
@@ -58,7 +59,7 @@ def _ehandler(ctx, option, debug):
     "--output",
     type=click.Path(dir_okay=False, writable=True, path_type=Path),
 )
-@click.argument("command")
+@click.argument("command", nargs=-1)
 @click.pass_context
 def cli(
     ctx,
@@ -73,6 +74,12 @@ def cli(
     localize,
     command,
 ):
+
+    if len(command) == 1:
+        command = command[0]
+    else:
+        command = shlex.join(command)
+
     if fmt is None:
         for _fmt in formats.keys():
             if command.split()[0] == _fmt:

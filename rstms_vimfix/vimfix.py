@@ -8,6 +8,7 @@ from subprocess import PIPE, run
 
 from .verify import verify
 
+
 def strip_ansi_codes(s):
     return strip_crlf(re.sub(r"\x1B[@-_][0-?]*[ -/]*[@-~]", "", s))
 

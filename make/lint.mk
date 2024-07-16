@@ -23,8 +23,8 @@ fmt:	.fmt
 ### vim autofix
 fix:
 	isort $(ISORT_OPTS) $(src_dirs)
-	vimfix 'black $(BLACK_OPTS) $(src_dirs)'
-	vimfix 'flake8 $(FLAKE8_OPTS) $(src_dirs)'
+	vimfix -- black $(BLACK_OPTS) $(src_dirs)
+	vimfix -- flake8 $(FLAKE8_OPTS) $(src_dirs)
 
 
 lint-clean:
