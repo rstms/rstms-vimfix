@@ -70,7 +70,7 @@ def try_quickfix(errors, localize):
         if localize:
             errors = [fix_path(line) for line in errors if line]
         quickfix.write_text("\n".join(errors))
-        run(["vim", "-q", str(quickfix)])
+        run(["vim", "-n", "-q", str(quickfix)])
         quickfix.unlink()
     sys.exit(-1)
 
