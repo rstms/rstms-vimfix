@@ -47,7 +47,15 @@ def forge_errors(lines):
 
 
 def generic_errors(lines):
-    return [line for line in lines if line and not line.startswith("#")]
+    def is_error(line):
+        if line.startswith("#"):
+            return False
+        elif ":" in line:
+            return True
+        else:
+            return False
+
+    return [line for line in lines if line and is_error(line)]
 
 
 def black_errors(lines):

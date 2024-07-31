@@ -62,4 +62,4 @@ collect_ignore = ['setup.py']
 
 
 [project.scripts]
-vimfix = "rstms_vimfix:cli"
+fix = "rstms_vimfix:cli"
